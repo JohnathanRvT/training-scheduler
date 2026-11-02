@@ -1,0 +1,37 @@
+# WordPress specific
+wp-content/plugins/your-plugin-name/
+
+# PHP
+*.log
+*.php~ # Temp files
+*.bak
+*.swp
+
+# Node / Build
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Composer
+vendor/
+composer.lock
+
+# Build Output
+/build/
+dist/
+*.map
+
+# IDEs
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*
+.envrc
