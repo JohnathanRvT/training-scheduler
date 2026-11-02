@@ -32,7 +32,7 @@ class JRVT_Admin_Page {
             26
         );
 
-        // Submenu: Calendar (same as main)
+        // Submenu: Calendar
         add_submenu_page(
             'training-scheduler',
             __('Calendar View', 'training-scheduler'),
@@ -93,10 +93,17 @@ class JRVT_Admin_Page {
             true
         );
 
+        $packages = Training_Scheduler_Core::get_packages();
+        $packages_map = [];
+        foreach ($packages as $pkg) {
+            $packages_map[$pkg['id']] = $pkg;
+        }
+
         wp_localize_script('training-scheduler-calendar', 'TrainingAdminData', [
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce'    => wp_create_nonce('training_admin_nonce'),
-            'currency' => Training_Scheduler_Core::get_business_info()['currency'] ?? 'R',
+            'ajax_url'     => admin_url('admin-ajax.php'),
+            'nonce'        => wp_create_nonce('training_admin_nonce'),
+            'currency'     => Training_Scheduler_Core::get_business_info()['currency'] ?? 'R',
+            'packages_map' => $packages_map,
         ]);
     }
 
@@ -154,18 +161,21 @@ class JRVT_Admin_Page {
 
         foreach ($bookings as $b) {
             $events[] = [
-                'id'          => $b['id'],
-                'title'       => $b['client_name'] . ' (' . $b['package_name'] . ')',
-                'date'        => $b['date'],
-                'start_time'  => $b['start_time'],
-                'end_time'    => $b['end_time'],
-                'status'      => $b['status'],
-                'client_name' => $b['client_name'],
-                'client_email'=> $b['client_email'],
-                'client_phone'=> $b['client_phone'],
-                'package_id'  => $b['package_id'],
-                'package_name'=> $b['package_name'],
-                'notes'       => $b['notes'],
+                'id'             => $b['id'],
+                'title'          => $b['client_name'] . ' (' . $b['package_name'] . ')',
+                'date'           => $b['date'],
+                'start_time'     => $b['start_time'],
+                'end_time'       => $b['end_time'],
+                'status'         => $b['status'],
+                'payment_status' => $b['payment_status'],
+                'payment_method' => $b['payment_method'],
+                'client_name'    => $b['client_name'],
+                'client_email'   => $b['client_email'],
+                'client_phone'   => $b['client_phone'],
+                'package_id'     => $b['package_id'],
+                'package_name'   => $b['package_name'],
+                'duration'       => $b['duration'],
+                'notes'          => $b['notes'],
             ];
         }
 
@@ -178,11 +188,13 @@ class JRVT_Admin_Page {
             wp_send_json_error(['message' => 'Unauthorized']);
         }
 
-        $booking_id = Training_Scheduler_Core::save_booking($_POST);
-        if ($booking_id) {
+        $result = Training_Scheduler_Core::save_booking($_POST);
+        if (is_wp_error($result)) {
+            wp_send_json_error(['message' => $result->get_error_message()]);
+        } elseif ($result) {
             wp_send_json_success([
                 'message' => __('Booking saved successfully!', 'training-scheduler'),
-                'booking' => Training_Scheduler_Core::get_booking($booking_id),
+                'booking' => Training_Scheduler_Core::get_booking($result),
             ]);
         } else {
             wp_send_json_error(['message' => __('Failed to save booking.', 'training-scheduler')]);
