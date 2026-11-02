@@ -96,7 +96,7 @@ class JRVT_Admin_Page {
         wp_localize_script('training-scheduler-calendar', 'TrainingAdminData', [
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce'    => wp_create_nonce('training_admin_nonce'),
-            'currency' => Training_Scheduler_Core::get_business_info()['currency'] ?? '$',
+            'currency' => Training_Scheduler_Core::get_business_info()['currency'] ?? 'R',
         ]);
     }
 

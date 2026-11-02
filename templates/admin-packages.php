@@ -5,7 +5,7 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-$currency = $business_info['currency'] ?? '$';
+$currency = $business_info['currency'] ?? 'R';
 ?>
 <div class="wrap training-scheduler-admin-wrap">
     <div class="training-header">

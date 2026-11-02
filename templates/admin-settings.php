@@ -68,8 +68,8 @@ $days = [
                     <tr>
                         <th scope="row"><label for="biz_currency"><?php esc_html_e('Currency Symbol', 'training-scheduler'); ?></label></th>
                         <td>
-                            <input type="text" id="biz_currency" name="business_info[currency]" value="<?php echo esc_attr($business_info['currency'] ?? '$'); ?>" class="small-text">
-                            <span class="description"><?php esc_html_e('e.g. $, €, £, R', 'training-scheduler'); ?></span>
+                            <input type="text" id="biz_currency" name="business_info[currency]" value="<?php echo esc_attr($business_info['currency'] ?? 'R'); ?>" class="small-text">
+                            <span class="description"><?php esc_html_e('e.g. R (South African Rand), $, €', 'training-scheduler'); ?></span>
                         </td>
                     </tr>
                     <tr>

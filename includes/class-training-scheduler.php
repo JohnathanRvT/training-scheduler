@@ -92,9 +92,9 @@ class Training_Scheduler_Core {
         return [
             'business_name'   => 'Pro Training Studio',
             'email'           => get_option('admin_email', 'trainer@example.com'),
-            'phone'           => '+1 (555) 019-2834',
-            'address'         => '123 Fitness Ave, Suite 100, New York, NY',
-            'currency'        => '$',
+            'phone'           => '+27 (0) 11 555 0192',
+            'address'         => '123 Training Way, Sandton, Johannesburg',
+            'currency'        => 'R',
             'slot_duration'   => 60, // in minutes
             'booking_notice'  => 2, // minimum hours in advance
             'cancellation_notice' => 24, // hours before session
@@ -120,7 +120,7 @@ class Training_Scheduler_Core {
         $clean['email']           = sanitize_email($input['email'] ?? '');
         $clean['phone']           = sanitize_text_field($input['phone'] ?? '');
         $clean['address']         = sanitize_textarea_field($input['address'] ?? '');
-        $clean['currency']        = sanitize_text_field($input['currency'] ?? '$');
+        $clean['currency']        = sanitize_text_field($input['currency'] ?? 'R');
         $clean['slot_duration']   = max(15, intval($input['slot_duration'] ?? 60));
         $clean['booking_notice']  = max(0, intval($input['booking_notice'] ?? 2));
         $clean['cancellation_notice'] = max(0, intval($input['cancellation_notice'] ?? 24));

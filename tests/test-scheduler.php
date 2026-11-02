@@ -131,7 +131,7 @@ $raw_info = [
     'email' => 'trainer@example.com',
     'phone' => '+1234567890',
     'address' => '123 Main St',
-    'currency' => '$',
+    'currency' => 'R',
     'slot_duration' => '45',
     'booking_notice' => '3'
 ];
@@ -139,9 +139,15 @@ $sanitized_info = Training_Scheduler_Core::sanitize_business_info($raw_info);
 assert($sanitized_info['business_name'] === 'PowerFit Gym');
 assert($sanitized_info['slot_duration'] === 45);
 assert($sanitized_info['booking_notice'] === 3);
+assert($sanitized_info['currency'] === 'R');
 update_option(Training_Scheduler_Core::OPTION_BUSINESS_INFO, $sanitized_info);
 $retrieved_info = Training_Scheduler_Core::get_business_info();
 assert($retrieved_info['business_name'] === 'PowerFit Gym');
+assert($retrieved_info['currency'] === 'R');
+
+// Test default currency when no option is set
+$default_info = Training_Scheduler_Core::get_default_business_info();
+assert($default_info['currency'] === 'R', "Default currency must be Rands (R)");
 echo "PASSED\n";
 
 // Test 2: Training Package CRUD
