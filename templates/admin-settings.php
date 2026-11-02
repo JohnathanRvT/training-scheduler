@@ -38,7 +38,7 @@ $days = [
             <!-- Business Info Card -->
             <div class="settings-card">
                 <h2><?php esc_html_e('Business & Contact Information', 'training-scheduler'); ?></h2>
-                <p class="description"><?php esc_html_e('These details are displayed on public booking forms, headers, and notifications.', 'training-scheduler'); ?></p>
+                <p class="description"><?php esc_html_e('Set your business identity, contact channels, and currency.', 'training-scheduler'); ?></p>
 
                 <table class="form-table">
                     <tr>
@@ -69,20 +69,7 @@ $days = [
                         <th scope="row"><label for="biz_currency"><?php esc_html_e('Currency Symbol', 'training-scheduler'); ?></label></th>
                         <td>
                             <input type="text" id="biz_currency" name="business_info[currency]" value="<?php echo esc_attr($business_info['currency'] ?? 'R'); ?>" class="small-text">
-                            <span class="description"><?php esc_html_e('e.g. R (South African Rand), $, €', 'training-scheduler'); ?></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><label for="biz_notice"><?php esc_html_e('Min. Advance Notice (hours)', 'training-scheduler'); ?></label></th>
-                        <td>
-                            <input type="number" id="biz_notice" name="business_info[booking_notice]" value="<?php echo esc_attr($business_info['booking_notice'] ?? 2); ?>" min="0" class="small-text">
-                            <span class="description"><?php esc_html_e('How many hours ahead must a client book?', 'training-scheduler'); ?></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><label for="biz_about"><?php esc_html_e('About / Bio', 'training-scheduler'); ?></label></th>
-                        <td>
-                            <textarea id="biz_about" name="business_info[about]" rows="4" class="large-text"><?php echo esc_textarea($business_info['about'] ?? ''); ?></textarea>
+                            <span class="description"><?php esc_html_e('e.g. R (South African Rand)', 'training-scheduler'); ?></span>
                         </td>
                     </tr>
                 </table>
@@ -91,7 +78,7 @@ $days = [
             <!-- Business Hours Card -->
             <div class="settings-card">
                 <h2><?php esc_html_e('Weekly Operating Hours', 'training-scheduler'); ?></h2>
-                <p class="description"><?php esc_html_e('Define your available opening and closing hours for each day of the week.', 'training-scheduler'); ?></p>
+                <p class="description"><?php esc_html_e('Sessions can only be booked during open times on enabled days.', 'training-scheduler'); ?></p>
 
                 <table class="hours-table widefat striped">
                     <thead>

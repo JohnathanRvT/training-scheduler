@@ -96,7 +96,7 @@
 }
 
 .cal-month-table td {
-    height: 110px;
+    height: 115px;
     vertical-align: top;
     padding: 6px;
     border: 1px solid #e2e8f0;
@@ -138,7 +138,8 @@
 .cal-add-btn {
     cursor: pointer;
     color: #94a3b8;
-    font-size: 14px;
+    font-size: 16px;
+    font-weight: bold;
     line-height: 1;
     opacity: 0;
     transition: opacity 0.2s;
@@ -155,7 +156,7 @@
 /* Event Pills */
 .cal-event-pill {
     margin-bottom: 4px;
-    padding: 3px 6px;
+    padding: 4px 6px;
     border-radius: 4px;
     font-size: 11px;
     font-weight: 500;
@@ -194,6 +195,25 @@
     text-decoration: line-through;
 }
 
+.cal-pill-pay {
+    font-size: 10px;
+    font-weight: 700;
+}
+.cal-pill-pay.paid { color: #16a34a; }
+.cal-pill-pay.unpaid { color: #dc2626; }
+
+/* Calculated time badge */
+.calculated-time-badge {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    display: inline-block;
+}
+
 /* Packages Grid */
 .packages-grid {
     display: grid;
@@ -207,23 +227,9 @@
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     padding: 20px;
-    position: relative;
     display: flex;
     flex-direction: column;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.package-badge {
-    position: absolute;
-    top: -10px;
-    right: 15px;
-    background: #2271b1;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    padding: 3px 10px;
-    border-radius: 12px;
 }
 
 .package-title {
@@ -236,12 +242,12 @@
     font-size: 28px;
     font-weight: 700;
     color: #1e293b;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .package-price .currency {
     font-size: 18px;
-    vertical-align: super;
+    margin-right: 2px;
 }
 
 .package-meta-details {
@@ -263,27 +269,7 @@
     font-size: 13px;
     line-height: 1.5;
     margin-bottom: 16px;
-}
-
-.package-features-list {
-    margin: 0 0 20px;
-    padding: 0;
-    list-style: none;
     flex: 1;
-}
-
-.package-features-list li {
-    font-size: 13px;
-    color: #334155;
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.package-features-list li .dashicons-yes-alt {
-    color: #16a34a;
-    font-size: 16px;
 }
 
 .package-card-actions {
@@ -311,7 +297,7 @@
 .training-modal-content {
     background: #fff;
     width: 100%;
-    max-width: 560px;
+    max-width: 580px;
     border-radius: 8px;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
     overflow: hidden;
@@ -395,6 +381,18 @@
 .status-badge.pending   { background: #fef9c3; color: #854d0e; }
 .status-badge.completed { background: #e0e7ff; color: #3730a3; }
 .status-badge.cancelled { background: #fee2e2; color: #991b1b; }
+
+/* Payment Badges */
+.payment-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.payment-badge.paid   { background: #dcfce7; color: #15803d; }
+.payment-badge.unpaid { background: #fee2e2; color: #b91c1c; }
 
 .package-pill {
     background: #f1f5f9;

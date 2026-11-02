@@ -55,16 +55,6 @@
                         self.render();
                     }
                 });
-            } else if (typeof TrainingPublicData !== 'undefined') {
-                $.post(TrainingPublicData.ajax_url, {
-                    action: 'training_get_public_calendar_events',
-                    nonce: TrainingPublicData.nonce
-                }, function(response) {
-                    if (response.success && response.data.events) {
-                        self.events = response.data.events;
-                        self.render();
-                    }
-                });
             } else {
                 self.render();
             }
@@ -151,10 +141,13 @@
             cell += `<div class="cal-events-list">`;
 
             dayEvents.forEach(evt => {
-                const title = evt.title || (evt.client_name ? `${evt.client_name} (${evt.start_time})` : 'Session');
-                const timeLabel = evt.start_time ? `${evt.start_time} ` : '';
-                cell += `<div class="cal-event-pill status-${evt.status || 'confirmed'}" data-id="${evt.id}" title="${timeLabel}${title}">`;
-                cell += `<strong>${timeLabel}</strong>${title}`;
+                const title = evt.title || (evt.client_name ? `${evt.client_name}` : 'Session');
+                const timeLabel = evt.start_time ? `${evt.start_time}-${evt.end_time} ` : '';
+                const isPaid = (evt.payment_status === 'paid');
+                const payBadge = isPaid ? '• PAID' : '• UNPAID';
+
+                cell += `<div class="cal-event-pill status-${evt.status || 'confirmed'}" data-id="${evt.id}" title="${timeLabel}${title} (${evt.payment_status || 'unpaid'})">`;
+                cell += `<strong>${timeLabel}</strong>${title} <span class="cal-pill-pay ${evt.payment_status || 'unpaid'}">${payBadge}</span>`;
                 cell += `</div>`;
             });
 
@@ -184,6 +177,39 @@
         }
     }
 
+    // Helper: Calculate End Time from Start Time and Duration
+    function calculateEndTime(startTime, durationMinutes) {
+        if (!startTime) return '--:--';
+        const parts = startTime.split(':');
+        if (parts.length < 2) return '--:--';
+
+        let totalMins = (parseInt(parts[0], 10) * 60) + parseInt(parts[1], 10) + parseInt(durationMinutes, 10);
+        let endH = Math.floor(totalMins / 60) % 24;
+        let endM = totalMins % 60;
+
+        return String(endH).padStart(2, '0') + ':' + String(endM).padStart(2, '0');
+    }
+
+    function updateCalculatedEndTime() {
+        const pkgId = $('#session-package').val();
+        let duration = 60;
+
+        if (pkgId && TrainingAdminData.packages_map && TrainingAdminData.packages_map[pkgId]) {
+            duration = parseInt(TrainingAdminData.packages_map[pkgId].duration_minutes, 10);
+        } else {
+            const selectedOpt = $('#session-package option:selected');
+            if (selectedOpt.data('duration')) {
+                duration = parseInt(selectedOpt.data('duration'), 10);
+            }
+        }
+
+        const startTime = $('#session-start-time').val();
+        const endTime = calculateEndTime(startTime, duration);
+
+        $('#calc-duration-text').text(`${duration} mins`);
+        $('#calc-end-time-text').text(endTime);
+    }
+
     // Admin Page Interactivity
     $(document).ready(function() {
         let calendar = null;
@@ -195,15 +221,18 @@
                     openSessionModal(event);
                 },
                 onDateClick: function(date) {
-                    openSessionModal({ date: date, start_time: '09:00', end_time: '10:00', status: 'confirmed' });
+                    openSessionModal({ date: date, start_time: '09:00', status: 'confirmed', payment_status: 'unpaid' });
                 }
             });
         }
 
+        // Live End Time Updates
+        $('#session-package, #session-start-time').on('change input', updateCalculatedEndTime);
+
         // Session Modal Handlers
         $('#open-new-session-modal').on('click', function() {
             const today = new Date().toISOString().split('T')[0];
-            openSessionModal({ date: today, start_time: '09:00', end_time: '10:00', status: 'confirmed' });
+            openSessionModal({ date: today, start_time: '09:00', status: 'confirmed', payment_status: 'unpaid' });
         });
 
         $('.close-modal').on('click', function() {
@@ -213,6 +242,7 @@
 
         function openSessionModal(data = {}) {
             $('#session-form')[0].reset();
+            $('#modal-error-notice').hide();
             $('#session-id').val(data.id || '');
             $('#session-client-name').val(data.client_name || '');
             $('#session-client-email').val(data.client_email || '');
@@ -220,9 +250,12 @@
             $('#session-package').val(data.package_id || '0');
             $('#session-date').val(data.date || '');
             $('#session-start-time').val(data.start_time || '09:00');
-            $('#session-end-time').val(data.end_time || '10:00');
             $('#session-status').val(data.status || 'confirmed');
+            $('#session-payment-status').val(data.payment_status || 'unpaid');
+            $('#session-payment-method').val(data.payment_method || 'unpaid');
             $('#session-notes').val(data.notes || '');
+
+            updateCalculatedEndTime();
 
             if (data.id) {
                 $('#session-modal-title').text('Edit Training Session #' + data.id);
@@ -237,9 +270,13 @@
 
         $('#session-form').on('submit', function(e) {
             e.preventDefault();
+            $('#modal-error-notice').hide();
+            $('#save-session-btn').prop('disabled', true).text('Saving...');
+
             const formData = $(this).serialize() + '&action=training_save_booking&nonce=' + TrainingAdminData.nonce;
 
             $.post(TrainingAdminData.ajax_url, formData, function(res) {
+                $('#save-session-btn').prop('disabled', false).text('Save Session');
                 if (res.success) {
                     $('#session-modal').fadeOut(150);
                     if (calendar) {
@@ -248,8 +285,13 @@
                         location.reload();
                     }
                 } else {
-                    alert(res.data.message || 'Error saving session');
+                    $('#modal-error-text').text(res.data.message || 'Error saving session');
+                    $('#modal-error-notice').fadeIn(150);
                 }
+            }).fail(function() {
+                $('#save-session-btn').prop('disabled', false).text('Save Session');
+                $('#modal-error-text').text('A server error occurred. Please check your connection.');
+                $('#modal-error-notice').fadeIn(150);
             });
         });
 
@@ -286,8 +328,9 @@
                 package_id: $btn.data('package'),
                 date: $btn.data('date'),
                 start_time: $btn.data('start'),
-                end_time: $btn.data('end'),
                 status: $btn.data('status'),
+                payment_status: $btn.data('payment-status'),
+                payment_method: $btn.data('payment-method'),
                 notes: $btn.data('notes')
             });
         });
@@ -310,8 +353,9 @@
         });
 
         // Bookings filtering & search
-        $('#filter-status, #search-bookings').on('input change', function() {
+        $('#filter-status, #filter-payment, #search-bookings').on('input change', function() {
             const statusFilter = $('#filter-status').val().toLowerCase();
+            const paymentFilter = $('#filter-payment').val().toLowerCase();
             const searchTerm = $('#search-bookings').val().toLowerCase();
 
             $('#bookings-table-body tr').each(function() {
@@ -319,12 +363,14 @@
                 if ($row.hasClass('no-items')) return;
 
                 const rowStatus = ($row.data('status') || '').toLowerCase();
+                const rowPayment = ($row.data('payment') || '').toLowerCase();
                 const rowSearch = ($row.data('search') || '').toLowerCase();
 
                 const matchStatus = !statusFilter || rowStatus === statusFilter;
+                const matchPayment = !paymentFilter || rowPayment === paymentFilter;
                 const matchSearch = !searchTerm || rowSearch.indexOf(searchTerm) !== -1;
 
-                if (matchStatus && matchSearch) {
+                if (matchStatus && matchPayment && matchSearch) {
                     $row.show();
                 } else {
                     $row.hide();
@@ -345,11 +391,8 @@
             $('#pkg-id').val($btn.data('id'));
             $('#pkg-title').val($btn.data('title'));
             $('#pkg-price').val($btn.data('price'));
-            $('#pkg-sessions').val($btn.data('sessions'));
             $('#pkg-duration').val($btn.data('duration'));
-            $('#pkg-badge').val($btn.data('badge'));
             $('#pkg-desc').val($btn.data('desc'));
-            $('#pkg-features').val($btn.data('features'));
 
             $('#package-modal-title').text('Edit Training Package');
             $('#package-modal').fadeIn(150);
@@ -394,7 +437,6 @@
         });
     });
 
-    // Expose TrainingCalendar globally for frontend calendar reuse
     window.TrainingCalendar = TrainingCalendar;
 
 })(jQuery);
