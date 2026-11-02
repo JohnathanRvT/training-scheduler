@@ -1,11 +1,16 @@
 <?php
+/**
+ * Public Display placeholder - All training scheduling, packages, and calendar features
+ * are managed within the WordPress Admin Backend.
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 class JRVT_Public_Display {
     public function __construct() {
-        add_shortcode('jrvt_hello', [$this, 'render_shortcode']);
-    }
-
-    public function render_shortcode() {
-        return '<p>Hello from JRVT Plugin!</p>';
+        // All scheduling and package operations are maintained in the WordPress Admin dashboard.
     }
 }
 
